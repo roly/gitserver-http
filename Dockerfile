@@ -6,8 +6,6 @@ RUN set -x && \
   mkdir /var/lib/git                                    && \
   touch /var/lib/git/index.html                          && \
   chown nginx.nginx /var/lib/git                       &&  \ 
-  mkdir -p /root/.config/git/                             && \
-  chown nginx.nginx /root/.config/git/                 && \
 
   git config --system http.receivepack true             &&  \
   git config --system http.uploadpack true              &&  \

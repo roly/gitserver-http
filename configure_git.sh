@@ -41,14 +41,17 @@ initialize_services() {
     "$FCGIPROGRAM"
 
    #remove nginx default config file so only our git-http config is used
-   rm /etc/nginx/conf.d/default.conf
+   rm -f /etc/nginx/conf.d/default.conf
 }
 
 initialize_initial_repositories() {
   cd $GIT_INITIAL_ROOT
   for dir in $(find . -name "*" -type d -maxdepth 1 -mindepth 1); do
-    echo "Initializing repository $dir"
-    init_and_commit $dir
+    #only init things that are not already in the repoistory volume
+    if [[ ! -d "$GIT_PROJECT_ROOT/${dir}.git" ]]; then
+        echo "Initializing repository $dir"
+        init_and_commit $dir
+    fi
   done
 }
 
