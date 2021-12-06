@@ -1,5 +1,4 @@
-# gitserver-http [![Build Status](https://travis-ci.org/cirocosta/gitserver-http.svg?branch=master)](https://travis-ci.org/cirocosta/gitserver-http)
-
+# gitserver-http
 > A git server with Nginx as the HTTP frontend and fast cgi wrapper for running the git http backend
 
 
@@ -38,7 +37,6 @@ Git servers work with bare repositories. This image provides the utility of init
   ```
   .
   └── initial
-      └── initial
           └── repo1
               └── file.txt
   ```

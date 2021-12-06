@@ -1,25 +1,15 @@
 #!/bin/bash
 
-# Initializes Nginx and the git cgi scripts
+# Initializes the git cgi scripts
 # for git http-backend through fcgiwrap.
-#
-# Usage:
-#   entrypoint <commands>
-#
-# Commands:
-#   -start    starts the git server (nginx + fcgi)
-#
-#   -init     turns directories under `/var/lib/initial`
-#             into bare repositories at `/var/lib/git`
-# 
 
 set -o errexit
 
 readonly GIT_PROJECT_ROOT="/var/lib/git"
 readonly GIT_INITIAL_ROOT="/var/lib/initial"
 readonly GIT_HTTP_EXPORT_ALL="true"
-readonly GIT_USER="git"
-readonly GIT_GROUP="git"
+readonly GIT_USER="nginx"
+readonly GIT_GROUP="nginx"
 
 readonly FCGIPROGRAM="/usr/bin/fcgiwrap"
 readonly USERID="nginx"
@@ -37,11 +27,9 @@ main() {
 }
 
 initialize_services() {
-  # Check permissions on $GIT_PROJECT_ROOT
-  if [[ ! $(stat -c %A ${GIT_PROJECT_ROOT}) -eq "drwxr-xr-x" ]]; then
-    chown -R giti:git $GIT_PROJECT_ROOT
-    chmod -R 775 $GIT_PROJECT_ROOT
-  fi
+  #set permissions as we expect them to be
+  chown -R $GIT_USER:$GIT_GROUP $GIT_PROJECT_ROOT
+  chmod -R 775 $GIT_PROJECT_ROOT
 
   /usr/bin/spawn-fcgi \
     -s $FCGISOCKET \
@@ -51,7 +39,9 @@ initialize_services() {
     -U $USERID \
     -G $GIT_GROUP -- \
     "$FCGIPROGRAM"
-  exec nginx
+
+   #remove nginx default config file so only our git-http config is used
+   rm /etc/nginx/conf.d/default.conf
 }
 
 initialize_initial_repositories() {

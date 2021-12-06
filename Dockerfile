@@ -1,11 +1,13 @@
 FROM nginx:alpine
-
+ENV HOME=/var/lib/git
 RUN set -x && \
   apk --update upgrade                                  &&  \
-  apk add git bash fcgiwrap spawn-fcgi wget             &&  \
-
-  adduser git -h /var/lib/git -D                        &&  \
-  adduser nginx git                                     &&  \
+  apk add git git-daemon bash fcgiwrap spawn-fcgi wget             &&  \
+  mkdir /var/lib/git                                    && \
+  touch /var/lib/git/index.html                          && \
+  chown nginx.nginx /var/lib/git                       &&  \ 
+  mkdir -p /root/.config/git/                             && \
+  chown nginx.nginx /root/.config/git/                 && \
 
   git config --system http.receivepack true             &&  \
   git config --system http.uploadpack true              &&  \
@@ -16,8 +18,5 @@ RUN set -x && \
   ln -sf /dev/stderr /var/log/nginx/error.log
 
 
-ADD ./etc /etc
-ADD ./entrypoint.sh /usr/local/bin/entrypoint
-
-ENTRYPOINT [ "entrypoint" ]
-CMD [ "-start" ]
+COPY ./git-http.conf /etc/nginx/conf.d/
+COPY configure_git.sh  /docker-entrypoint.d/99-configure_git.sh
